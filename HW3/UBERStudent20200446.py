@@ -1,31 +1,44 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 
 
-import sys
-import datetime
+import sys 
+import calendar 
 
-def get_days(date):
-	d = date.split('/')
-	days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
-	return days[datetime.date(int(d[2]), int(d[0]), int(d[1])).weekday()]
-sys.stdout = open(sys.argv[2], 'w')
+dayofweek = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] 
 
-result = {}
+datafile = sys.argv[1] 
+output = sys.argv[2] 
 
-with open(sys.argv[1]) as f:
-	for l in f:
-		data = l.strip().split(',')
-		data[1] = get_days(data[1])
-		data[2] = int(data[2])
-		data[3] = int(data[3])
-		if len(result) == 0:
-			result[(data[0], data[1])] = [data[2], data[3]]
-		else:
-			if (data[0], data[1]) in result.keys():
-				tmp = result[(data[0], data[1])]
-				tmp[0] += data[2]
-				tmp[1] += data[3]
-				result[(data[0], data[1])] = [data[2], data[3]]
-for k, v in result.items():
-	print("{},{} {},{}".format(k[0], k[1], v[0], v[1]))
-sys.stdout.close()
+rd = "" 
+data = dict() 
+list1 = [] 
+list2 = [] 
 
+v_sum = 0 
+t_sum = 0
+
+with open(datafile, "rt") as f: 	
+	for line in f: 		
+		info = line.split(",") 		
+		date = info[1].split("/") 		
+		day = calendar.weekday(int(date[2]), int(date[0]), int(date[1])) 		 		
+		rd = info[0] + "," + dayofweek[day] 	
+		
+		if rd not in data: 			
+			v = int(info[2]) 			
+			t = int(info[3]) 			
+			data[rd] = [v, t] 			 		
+		else: 			
+			v = int(info[2]) 			
+			t = int(info[3]) 			
+			list1 = data[rd] 			 			
+			
+			v_sum = int(list1[0]) + v 			
+			t_sum = int(list1[1]) + t 			 			
+			
+			data[rd] = [v_sum, t_sum] 	
+			
+
+with open(output, "wt") as op:
+	for i in data: 		
+		list2 = data[i] 		
+		op.write(i + " " + str(list2[0]) + "," + str(list2[1]) + "\n")
